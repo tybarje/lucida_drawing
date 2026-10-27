@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lucida Drawing</title>
+<meta name="description" content="Photograph your drawing, overlay the photo of your model and adjust the opacity: proportion errors jump out. Android app.">
+<meta name="theme-color" content="#1a1c20">
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<link rel="preload" href="police-instrument-serif-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Vitrine : feuille quadrillée en haut (le monde du carnet), bande graphite pour les atouts, une seule couleur vive, le jaune crayon HB */
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url('police-instrument-serif-400-italic.woff2') format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url('police-instrument-serif-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:400;font-display:swap;src:url('police-atkinson-hyperlegible-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Atkinson Hyperlegible';font-style:normal;font-weight:700;font-display:swap;src:url('police-atkinson-hyperlegible-700-normal.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url('police-ibm-plex-mono-500-normal.woff2') format('woff2')}
+:root{
+  --papier:#f1ece1;
+  --papier-clair:#faf7f0;
+  --encre:#1f2024;
+  --encre-douce:#585a61;
+  --trait:#d8cfbd;
+  --carreau:rgba(96,118,160,.16);
+  --graphite:#1a1c20;
+  --graphite-2:#26292f;
+  --sur-graphite:#eeeae1;
+  --sur-graphite-doux:#aaa69d;
+  --jaune:#f2c230;
+  --f-titre:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --f-corps:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-chiffres:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--papier);color:var(--encre);font:17px/1.6 var(--f-corps)}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--jaune);outline-offset:3px}
+.cadre{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance}
+h2{font-family:var(--f-titre);font-weight:400;font-size:clamp(2rem,4.5vw,2.9rem);line-height:1.05;margin:0 0 2rem}
+.etiquette{font-family:var(--f-chiffres);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--encre-douce)}
+
+/* En-tête */
+.entete{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding-block:1.1rem}
+.marque{display:flex;align-items:center;gap:.7rem;text-decoration:none}
+.marque img{width:40px;height:40px;border-radius:10px}
+.marque span{font-family:var(--f-titre);font-style:italic;font-size:1.45rem;line-height:1}
+.langues{display:flex;gap:.25rem;padding:3px;border:1px solid var(--trait);border-radius:999px;background:var(--papier-clair)}
+.langues button{font:600 .8rem/1 var(--f-chiffres);letter-spacing:.06em;border:0;background:none;color:var(--encre-douce);padding:.5rem .7rem;border-radius:999px;cursor:pointer;min-height:36px}
+.langues button[aria-pressed="true"]{background:var(--graphite);color:var(--sur-graphite)}
+
+/* Accroche */
+.accroche{background-color:var(--papier);background-image:linear-gradient(var(--carreau) 1px,transparent 1px),linear-gradient(90deg,var(--carreau) 1px,transparent 1px);background-size:24px 24px;border-bottom:1px solid var(--trait)}
+.accroche .cadre{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:3rem;align-items:center;padding-block:2.5rem 4rem}
+.accroche h1{font-family:var(--f-titre);font-style:italic;font-weight:400;font-size:clamp(2.6rem,6.2vw,4.4rem);line-height:.98;letter-spacing:-.01em;margin:.6rem 0 1.2rem}
+.accroche p.chapeau{font-size:1.12rem;max-width:34rem;margin:0 0 1.8rem;color:var(--encre)}
+.actions{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}
+.bouton{display:inline-flex;align-items:center;gap:.6rem;min-height:50px;padding:0 1.3rem;border-radius:999px;font-weight:700;text-decoration:none;font-size:1rem}
+.bouton.store{background:var(--graphite);color:var(--sur-graphite)}
+.bouton.store small{font:500 .7rem/1 var(--f-chiffres);letter-spacing:.06em;text-transform:uppercase;color:var(--jaune)}
+.bouton.lien{border:1px solid var(--encre);color:var(--encre)}
+.bouton.lien:hover{background:var(--encre);color:var(--papier)}
+
+/* Démonstration interactive */
+.demo{justify-self:center;width:min(100%,360px)}
+.ecran{position:relative;aspect-ratio:3/4;border-radius:28px;overflow:hidden;border:10px solid var(--graphite);background:var(--graphite);box-shadow:0 30px 60px -20px rgba(26,28,32,.45)}
+.ecran img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.reglette{display:grid;grid-template-columns:auto minmax(0,1fr) 3.2rem;align-items:center;gap:.8rem;margin-top:1rem;padding:.35rem .9rem;border-radius:999px;background:var(--graphite);color:var(--sur-graphite)}
+.reglette label{font-size:.85rem}
+.reglette output{font:500 .8rem var(--f-chiffres);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:32px;margin:0;background:transparent;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(var(--jaune),var(--jaune)) 0 0/var(--p) 100% no-repeat,#454850}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-9px;border-radius:50%;background:var(--sur-graphite);border:3px solid var(--jaune)}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:#454850}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--jaune)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--sur-graphite);border:3px solid var(--jaune)}
+.demo p{font-size:.88rem;color:var(--encre-douce);margin:.7rem .4rem 0;text-align:center}
+
+/* Étapes */
+section{padding-block:4.5rem}
+.etapes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2rem;list-style:none;margin:0;padding:0;counter-reset:etape}
+.etapes li{display:grid;gap:1rem;align-content:start;counter-increment:etape}
+.telephone{border:8px solid var(--graphite);border-radius:30px;overflow:hidden;background:var(--graphite);aspect-ratio:360/780;max-width:250px;width:100%;box-shadow:0 20px 40px -24px rgba(26,28,32,.5)}
+.telephone img{width:100%;height:100%;object-fit:cover}
+.etapes h3{font-size:1.15rem;margin:0;display:flex;gap:.6rem;align-items:baseline}
+.etapes h3::before{content:counter(etape);font-family:var(--f-titre);font-style:italic;font-weight:400;font-size:2rem;line-height:1;color:var(--encre)}
+.etapes p{margin:0;color:var(--encre-douce)}
+
+/* Atouts */
+.atouts{background:var(--graphite);color:var(--sur-graphite)}
+.atouts h2{color:var(--sur-graphite)}
+.grille-atouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.5rem 3rem}
+.grille-atouts h3{font-size:1.15rem;margin:0 0 .4rem;color:var(--sur-graphite)}
+.grille-atouts h3::after{content:"";display:block;width:2.2rem;height:3px;background:var(--jaune);margin-top:.55rem;border-radius:2px}
+.grille-atouts p{margin:0;color:var(--sur-graphite-doux)}
+
+/* Histoire */
+.histoire .cadre{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:3rem;align-items:center}
+.histoire figure{margin:0;background:var(--papier-clair);border:1px solid var(--trait);border-radius:18px;padding:1.5rem}
+.histoire figcaption{font-size:.85rem;color:var(--encre-douce);margin-top:.8rem;text-align:center}
+.histoire p{font-size:1.08rem;max-width:36rem;margin:0}
+
+/* Prix */
+.prix{background:var(--papier-clair);border-block:1px solid var(--trait)}
+.offres{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;max-width:760px}
+.offre{border:1px solid var(--trait);border-radius:20px;padding:1.6rem;background:var(--papier);display:grid;gap:.6rem;align-content:start}
+.offre.forte{background:var(--graphite);color:var(--sur-graphite);border-color:var(--graphite)}
+.offre h3{margin:0;font-size:1.1rem}
+.montant{font-family:var(--f-titre);font-size:3.2rem;line-height:1}
+.montant small{font-family:var(--f-corps);font-size:1rem;margin-left:.4rem;color:var(--encre-douce)}
+.offre.forte .montant{color:var(--jaune)}
+.offre.forte .montant small{color:var(--sur-graphite-doux)}
+.offre p{margin:0}
+.offre.forte p{color:var(--sur-graphite-doux)}
+.note-prix{margin:1.2rem 0 0;font-size:.85rem;color:var(--encre-douce)}
+
+/* Questions */
+.questions{max-width:760px}
+.questions details{border-bottom:1px solid var(--trait);padding:1rem 0}
+.questions summary{cursor:pointer;font-weight:700;font-size:1.05rem;list-style:none;display:flex;justify-content:space-between;gap:1rem;align-items:center;min-height:44px}
+.questions summary::-webkit-details-marker{display:none}
+.questions summary::after{content:"+";font:500 1.4rem/1 var(--f-chiffres);color:var(--encre-douce);flex:none}
+.questions details[open] summary::after{content:"–"}
+.questions p{margin:.4rem 0 0;color:var(--encre-douce);max-width:62ch}
+
+/* Pied de page */
+.pied{background:var(--graphite);color:var(--sur-graphite-doux);font-size:.9rem}
+.pied .cadre{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;align-items:center;padding-block:2rem calc(2rem + env(safe-area-inset-bottom,0px))}
+.pied nav{display:flex;flex-wrap:wrap;gap:1rem 1.5rem}
+.pied a{color:var(--sur-graphite);text-underline-offset:3px;text-decoration-color:var(--jaune)}
+
+@media (max-width:860px){
+  .accroche .cadre,.histoire .cadre{grid-template-columns:minmax(0,1fr);gap:2.5rem}
+  .etapes{grid-template-columns:minmax(0,1fr);gap:2.8rem}
+  .etapes li{grid-template-columns:minmax(0,130px) minmax(0,1fr);align-items:center;gap:1.2rem}
+  .grille-atouts,.offres{grid-template-columns:minmax(0,1fr)}
+  section{padding-block:3.5rem}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+
+<header class="cadre entete">
+  <a class="marque" href="#">
+    <img src="icone.svg" alt="" width="40" height="40">
+    <span>Lucida Drawing</span>
+  </a>
+  <div class="langues" role="group" aria-label="Language">
+    <button type="button" data-langue="en" lang="en" aria-pressed="true">EN</button>
+    <button type="button" data-langue="fr" lang="fr" aria-pressed="false">FR</button>
+    <button type="button" data-langue="es" lang="es" aria-pressed="false">ES</button>
+    <button type="button" data-langue="de" lang="de" aria-pressed="false">DE</button>
+  </div>
+</header>
+
+<main>
+<div class="accroche">
+  <div class="cadre">
+    <div>
+      <span class="etiquette" data-t="eyebrow">For people learning to draw</span>
+      <h1 data-t="titre">See exactly where your drawing drifts from the model</h1>
+      <p class="chapeau" data-t="chapeau">Draw freehand as usual. Then photograph your drawing, lay the photo of your model over it and adjust the opacity: proportions, angles and spacing that are off jump out at once.</p>
+      <div class="actions">
+        <span class="bouton store" aria-disabled="true"><span data-t="cta">Coming soon on Google Play</span><small>Android</small></span>
+        <a class="bouton lien" href="#comment" data-t="cta2">See how it works</a>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="ecran">
+        <img src="demo-dessin.webp" width="720" height="960" data-t-alt="altDessin" alt="Pencil drawing of a pear on squared paper">
+        <img id="demo-modele" src="demo-modele.webp" width="720" height="960" data-t-alt="altModele" alt="Photo of a pear, used as the model" style="opacity:.5">
+      </div>
+      <div class="reglette">
+        <label for="demo-opacite" data-t="opacite">Opacity</label>
+        <input type="range" id="demo-opacite" min="0" max="100" value="50">
+        <output id="demo-valeur" for="demo-opacite">50%</output>
+      </div>
+      <p data-t="indice">Move the slider: the yellow pear is the model, the pencil lines are the drawing.</p>
+    </div>
+  </div>
+</div>
+
+<section id="comment">
+  <div class="cadre">
+    <h2 data-t="etapesTitre">Three steps, no tracing</h2>
+    <ol class="etapes">
+      <li>
+        <div class="telephone"><img data-capture="1" src="capture-1-en.webp" width="540" height="1170" loading="lazy" data-t-alt="alt1" alt="Lucida Drawing home screen"></div>
+        <div><h3 data-t="etape1T">Photograph your drawing</h3><p data-t="etape1">Take a photo of your finished drawing with the app.</p></div>
+      </li>
+      <li>
+        <div class="telephone"><img data-capture="2" src="capture-2-en.webp" width="540" height="1170" loading="lazy" data-t-alt="alt2" alt="The model overlaid on the drawing at 50% opacity"></div>
+        <div><h3 data-t="etape2T">Choose your model</h3><p data-t="etape2">Pick the photo you drew from in your gallery.</p></div>
+      </li>
+      <li>
+        <div class="telephone"><img data-capture="3" src="capture-3-en.webp" width="540" height="1170" loading="lazy" data-t-alt="alt3" alt="The overlay with a lettered and numbered grid"></div>
+        <div><h3 data-t="etape3T">Overlay and compare</h3><p data-t="etape3">Drag the model onto your drawing, pinch to resize or rotate it, then play with the opacity. Add a grid to locate each gap.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="atouts">
+  <div class="cadre">
+    <h2 data-t="atoutsTitre">Why it helps you improve</h2>
+    <div class="grille-atouts">
+      <div><h3 data-t="atout1T">You draw for real</h3><p data-t="atout1">Lucida Drawing doesn't project anything while you draw. You work freehand, then check: that's how your eye learns.</p></div>
+      <div><h3 data-t="atout2T">Errors become visible</h3><p data-t="atout2">A head too narrow, an eye too high, a tilted axis: once overlaid, the gap is obvious and measurable.</p></div>
+      <div><h3 data-t="atout3T">A grid to locate them</h3><p data-t="atout3">Lettered columns and numbered rows: “the jaw is off in D7” is easier to fix than “something is wrong”.</p></div>
+      <div><h3 data-t="atout4T">Your photos stay on your phone</h3><p data-t="atout4">No account, no ads, no tracking. Nothing is sent anywhere.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="histoire">
+  <div class="cadre">
+    <figure>
+      <svg viewBox="0 0 320 240" role="img" data-t-aria="altPrisme" aria-label="Diagram of a camera lucida prism: light from the subject is reflected twice and reaches the eye above the paper">
+        <rect x="40" y="206" width="240" height="10" rx="2" fill="#ffffff" stroke="#1f2024" stroke-width="2"></rect>
+        <path d="M262 206 V60 H214" fill="none" stroke="#1f2024" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+        <polygon points="150,48 214,48 195.3,93.3 150,112" fill="#f2c230" fill-opacity=".35" stroke="#1f2024" stroke-width="3" stroke-linejoin="round"></polygon>
+        <polyline points="20,106 165.4,106 207.7,63.7 207.7,48 207.7,14" fill="none" stroke="#c49a12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        <path d="M196 14 Q207.7 4 219.4 14 Q207.7 24 196 14 Z" fill="#ffffff" stroke="#1f2024" stroke-width="2"></path>
+        <circle cx="207.7" cy="14" r="3" fill="#1f2024"></circle>
+        <path d="M200 20 L150 204" fill="none" stroke="#1f2024" stroke-width="1.8" stroke-dasharray="4 5"></path>
+        <path d="M110 200 q12 -10 24 0 t24 0" fill="none" stroke="#1f2024" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <figcaption data-t="legendePrisme">The light from the subject is reflected twice inside the prism and reaches the eye, which also sees the paper.</figcaption>
+    </figure>
+    <div>
+      <h2 data-t="histoireTitre">Where the name comes from</h2>
+      <p data-t="histoire">In 1806, William Hyde Wollaston patented the camera lucida: a small prism on a stand that lets an artist see the subject and the paper at the same time. Lucida Drawing applies the same idea once the drawing is done: model and drawing in a single view.</p>
+    </div>
+  </div>
+</section>
+
+<section class="prix">
+  <div class="cadre">
+    <h2 data-t="prixTitre">Simple pricing</h2>
+    <div class="offres">
+      <div class="offre">
+        <h3 data-t="gratuitT">Free</h3>
+        <div class="montant"><span data-t="gratuitMontant">€0</span></div>
+        <p data-t="gratuit">3 comparisons per day, every feature included.</p>
+      </div>
+      <div class="offre forte">
+        <h3 data-t="illimiteT">Unlimited</h3>
+        <div class="montant"><span data-t="illimiteMontant">€5</span><small data-t="parMois">per month</small></div>
+        <p data-t="illimite">As many comparisons as you want. No commitment: cancel anytime in Google Play.</p>
+      </div>
+    </div>
+    <p class="note-prix" data-t="notePrix">Prices in euros; Google Play shows the equivalent in your currency.</p>
+  </div>
+</section>
+
+<section>
+  <div class="cadre">
+    <h2 data-t="faqTitre">Questions</h2>
+    <div class="questions">
+      <details><summary data-t="q1">Is it a tracing app?</summary><p data-t="r1">No. Tracing apps project an image so you can copy it line by line. Lucida Drawing is used after you've drawn, to compare your work with the model and see what to correct.</p></details>
+      <details><summary data-t="q2">Do my photos leave my phone?</summary><p data-t="r2">No. Your photos are only displayed on your phone. The app has no account and sends nothing to any server.</p></details>
+      <details><summary data-t="q3">Which phones does it work on?</summary><p data-t="r3">Android phones running Android 7 or later. There is no iPhone version.</p></details>
+      <details><summary data-t="q4">How do I cancel the subscription?</summary><p data-t="r4">In the Google Play app: profile icon, Payments and subscriptions, Subscriptions, Lucida Drawing. Unlimited stays active until the end of the month already paid.</p></details>
+      <details><summary data-t="q5">Which languages?</summary><p data-t="r5">English, French, Spanish and German. The app follows your phone's language.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="pied">
+  <div class="cadre">
+    <span data-t="droits">© 2026 Lucida Drawing. Google Play is a trademark of Google LLC.</span>
+    <nav aria-label="Liens">
+      <a href="mailto:lucida.drawing@gmail.com"><span data-t="contact">Contact</span> · lucida.drawing@gmail.com</a>
+      <a id="lien-confidentialite" href="privacy.html#en" data-t="confidentialite">Privacy policy</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var TEXTES = {
+    en: {
+      eyebrow: 'For people learning to draw',
+      titre: 'See exactly where your drawing drifts from the model',
+      chapeau: 'Draw freehand as usual. Then photograph your drawing, lay the photo of your model over it and adjust the opacity: proportions, angles and spacing that are off jump out at once.',
+      cta: 'Coming soon on Google Play', cta2: 'See how it works',
+      opacite: 'Opacity', pourcent: function (n) { return n + '%'; },
+      indice: 'Move the slider: the yellow pear is the model, the pencil lines are the drawing.',
+      altDessin: 'Pencil drawing of a pear on squared paper', altModele: 'Photo of a pear, used as the model',
+      etapesTitre: 'Three steps, no tracing',
+      etape1T: 'Photograph your drawing', etape1: 'Take a photo of your finished drawing with the app.',
+      etape2T: 'Choose your model', etape2: 'Pick the photo you drew from in your gallery.',
+      etape3T: 'Overlay and compare', etape3: 'Drag the model onto your drawing, pinch to resize or rotate it, then play with the opacity. Add a grid to locate each gap.',
+      alt1: 'Lucida Drawing home screen', alt2: 'The model overlaid on the drawing at 50% opacity', alt3: 'The overlay with a lettered and numbered grid',
+      atoutsTitre: 'Why it helps you improve',
+      atout1T: 'You draw for real', atout1: "Lucida Drawing doesn't project anything while you draw. You work freehand, then check: that's how your eye learns.",
+      atout2T: 'Errors become visible', atout2: 'A head too narrow, an eye too high, a tilted axis: once overlaid, the gap is obvious and measurable.',
+      atout3T: 'A grid to locate them', atout3: 'Lettered columns and numbered rows: “the jaw is off in D7” is easier to fix than “something is wrong”.',
+      atout4T: 'Your photos stay on your phone', atout4: 'No account, no ads, no tracking. Nothing is sent anywhere.',
+      altPrisme: 'Diagram of a camera lucida prism: light from the subject is reflected twice and reaches the eye above the paper',
+      legendePrisme: 'The light from the subject is reflected twice inside the prism and reaches the eye, which also sees the paper.',
+      histoireTitre: 'Where the name comes from',
+      histoire: 'In 1806, William Hyde Wollaston patented the camera lucida: a small prism on a stand that lets an artist see the subject and the paper at the same time. Lucida Drawing applies the same idea once the drawing is done: model and drawing in a single view.',
+      prixTitre: 'Simple pricing',
+      gratuitT: 'Free', gratuitMontant: '€0', gratuit: '3 comparisons per day, every feature included.',
+      illimiteT: 'Unlimited', illimiteMontant: '€5', parMois: 'per month', illimite: 'As many comparisons as you want. No commitment: cancel anytime in Google Play.',
+      notePrix: 'Prices in euros; Google Play shows the equivalent in your currency.',
+      faqTitre: 'Questions',
+      q1: 'Is it a tracing app?', r1: "No. Tracing apps project an image so you can copy it line by line. Lucida Drawing is used after you've drawn, to compare your work with the model and see what to correct.",
+      q2: 'Do my photos leave my phone?', r2: 'No. Your photos are only displayed on your phone. The app has no account and sends nothing to any server.',
+      q3: 'Which phones does it work on?', r3: 'Android phones running Android 7 or later. There is no iPhone version.',
+      q4: 'How do I cancel the subscription?', r4: 'In the Google Play app: profile icon, Payments and subscriptions, Subscriptions, Lucida Drawing. Unlimited stays active until the end of the month already paid.',
+      q5: 'Which languages?', r5: "English, French, Spanish and German. The app follows your phone's language.",
+      droits: '© 2026 Lucida Drawing. Google Play is a trademark of Google LLC.', contact: 'Contact', confidentialite: 'Privacy policy',
+      description: 'Photograph your drawing, overlay the photo of your model and adjust the opacity: proportion errors jump out. Android app.'
+    },
+    fr: {
+      eyebrow: 'Pour apprendre à dessiner',
+      titre: "Vois exactement où ton dessin s'écarte du modèle",
+      chapeau: "Dessine à main levée, comme d'habitude. Ensuite, photographie ton dessin, pose la photo de ton modèle par-dessus et règle l'opacité : les proportions, les angles et les distances qui ne vont pas sautent aux yeux.",
+      cta: 'Bientôt sur Google Play', cta2: 'Voir comment ça marche',
+      opacite: 'Opacité', pourcent: function (n) { return n + ' %'; },
+      indice: 'Bouge le curseur : la poire jaune est le modèle, les traits de crayon sont le dessin.',
+      altDessin: "Dessin au crayon d'une poire sur papier quadrillé", altModele: "Photo d'une poire, utilisée comme modèle",
+      etapesTitre: 'Trois étapes, sans décalquer',
+      etape1T: 'Photographie ton dessin', etape1: "Prends ton dessin terminé en photo avec l'appli.",
+      etape2T: 'Choisis ton modèle', etape2: "Sélectionne dans ta galerie la photo d'après laquelle tu as dessiné.",
+      etape3T: 'Superpose et compare', etape3: "Fais glisser le modèle sur ton dessin, pince pour l'agrandir ou le tourner, puis joue sur l'opacité. Ajoute une grille pour situer chaque écart.",
+      alt1: "Écran d'accueil de Lucida Drawing", alt2: 'Le modèle superposé au dessin à 50 % d’opacité', alt3: 'La superposition avec une grille en lettres et en chiffres',
+      atoutsTitre: 'Pourquoi ça fait progresser',
+      atout1T: 'Tu dessines pour de vrai', atout1: "Lucida Drawing ne projette rien pendant que tu dessines. Tu travailles à main levée, puis tu vérifies : c'est comme ça que l'œil apprend.",
+      atout2T: 'Les erreurs deviennent visibles', atout2: "Une tête trop étroite, un œil trop haut, un axe penché : une fois superposé, l'écart est évident et mesurable.",
+      atout3T: 'Une grille pour les situer', atout3: 'Colonnes en lettres, lignes en chiffres : « la mâchoire déborde en D7 » se corrige plus facilement que « quelque chose cloche ».',
+      atout4T: 'Tes photos restent sur ton téléphone', atout4: "Pas de compte, pas de publicité, pas de traçage. Rien n'est envoyé nulle part.",
+      altPrisme: "Schéma du prisme d'une camera lucida : la lumière du sujet est réfléchie deux fois et atteint l'œil, au-dessus de la feuille",
+      legendePrisme: "La lumière du sujet est réfléchie deux fois dans le prisme et atteint l'œil, qui voit aussi la feuille.",
+      histoireTitre: "D'où vient le nom",
+      histoire: "En 1806, William Hyde Wollaston fait breveter la camera lucida : un petit prisme monté sur une tige, qui permet à l'artiste de voir en même temps son sujet et sa feuille. Lucida Drawing reprend cette idée une fois le dessin fini : le modèle et le dessin dans une seule vue.",
+      prixTitre: 'Des prix simples',
+      gratuitT: 'Gratuit', gratuitMontant: '0 €', gratuit: '3 comparaisons par jour, toutes les fonctions incluses.',
+      illimiteT: 'Illimité', illimiteMontant: '5 €', parMois: 'par mois', illimite: 'Autant de comparaisons que tu veux. Sans engagement : tu résilies quand tu veux dans Google Play.',
+      notePrix: "Prix en euros ; Google Play affiche l'équivalent dans ta monnaie.",
+      faqTitre: 'Questions fréquentes',
+      q1: "C'est une appli pour décalquer ?", r1: "Non. Les applis de décalque projettent une image pour que tu la recopies trait par trait. Lucida Drawing s'utilise après avoir dessiné, pour comparer ton travail au modèle et voir quoi corriger.",
+      q2: 'Mes photos quittent-elles mon téléphone ?', r2: "Non. Tes photos sont seulement affichées sur ton téléphone. L'appli n'a pas de compte et n'envoie rien sur aucun serveur.",
+      q3: 'Sur quels téléphones ça marche ?', r3: "Sur les téléphones Android 7 ou plus récents. Il n'existe pas de version iPhone.",
+      q4: "Comment résilier l'abonnement ?", r4: "Dans l'appli Google Play : icône de profil, Paiements et abonnements, Abonnements, Lucida Drawing. Tu gardes Illimité jusqu'à la fin du mois déjà payé.",
+      q5: 'Dans quelles langues ?', r5: "Français, anglais, espagnol et allemand. L'appli suit la langue de ton téléphone.",
+      droits: '© 2026 Lucida Drawing. Google Play est une marque de Google LLC.', contact: 'Contact', confidentialite: 'Politique de confidentialité',
+      description: "Photographie ton dessin, superpose la photo de ton modèle et règle l'opacité : les erreurs de proportion sautent aux yeux. Appli Android."
+    },
+    es: {
+      eyebrow: 'Para quien aprende a dibujar',
+      titre: 'Ve exactamente dónde se aleja tu dibujo del modelo',
+      chapeau: 'Dibuja a mano alzada, como siempre. Después, haz una foto de tu dibujo, coloca encima la foto de tu modelo y ajusta la opacidad: las proporciones, los ángulos y las distancias que fallan saltan a la vista.',
+      cta: 'Próximamente en Google Play', cta2: 'Ver cómo funciona',
+      opacite: 'Opacidad', pourcent: function (n) { return n + ' %'; },
+      indice: 'Mueve el control: la pera amarilla es el modelo, los trazos de lápiz son el dibujo.',
+      altDessin: 'Dibujo a lápiz de una pera sobre papel cuadriculado', altModele: 'Foto de una pera, usada como modelo',
+      etapesTitre: 'Tres pasos, sin calcar',
+      etape1T: 'Fotografía tu dibujo', etape1: 'Haz una foto de tu dibujo terminado con la app.',
+      etape2T: 'Elige tu modelo', etape2: 'Selecciona en tu galería la foto que usaste para dibujar.',
+      etape3T: 'Superpón y compara', etape3: 'Arrastra el modelo sobre tu dibujo, pellizca para ampliarlo o girarlo y juega con la opacidad. Añade una cuadrícula para situar cada diferencia.',
+      alt1: 'Pantalla de inicio de Lucida Drawing', alt2: 'El modelo superpuesto al dibujo con un 50 % de opacidad', alt3: 'La superposición con una cuadrícula de letras y números',
+      atoutsTitre: 'Por qué te ayuda a mejorar',
+      atout1T: 'Dibujas de verdad', atout1: 'Lucida Drawing no proyecta nada mientras dibujas. Trabajas a mano alzada y luego compruebas: así es como aprende el ojo.',
+      atout2T: 'Los errores se hacen visibles', atout2: 'Una cabeza demasiado estrecha, un ojo demasiado alto, un eje inclinado: al superponerlos, la diferencia es evidente y medible.',
+      atout3T: 'Una cuadrícula para situarlos', atout3: 'Columnas con letras, filas con números: «la mandíbula se sale en D7» se corrige mejor que «algo no cuadra».',
+      atout4T: 'Tus fotos se quedan en tu teléfono', atout4: 'Sin cuenta, sin publicidad, sin rastreo. No se envía nada a ninguna parte.',
+      altPrisme: 'Esquema del prisma de una cámara lúcida: la luz del modelo se refleja dos veces y llega al ojo, por encima del papel',
+      legendePrisme: 'La luz del modelo se refleja dos veces dentro del prisma y llega al ojo, que también ve el papel.',
+      histoireTitre: 'De dónde viene el nombre',
+      histoire: 'En 1806, William Hyde Wollaston patentó la cámara lúcida: un pequeño prisma montado sobre una varilla que permite al artista ver a la vez el modelo y el papel. Lucida Drawing retoma esa idea una vez terminado el dibujo: modelo y dibujo en una sola vista.',
+      prixTitre: 'Precios sencillos',
+      gratuitT: 'Gratis', gratuitMontant: '0 €', gratuit: '3 comparaciones al día, con todas las funciones.',
+      illimiteT: 'Ilimitado', illimiteMontant: '5 €', parMois: 'al mes', illimite: 'Todas las comparaciones que quieras. Sin permanencia: cancela cuando quieras en Google Play.',
+      notePrix: 'Precios en euros; Google Play muestra el equivalente en tu moneda.',
+      faqTitre: 'Preguntas frecuentes',
+      q1: '¿Es una app para calcar?', r1: 'No. Las apps de calco proyectan una imagen para copiarla trazo a trazo. Lucida Drawing se usa después de dibujar, para comparar tu trabajo con el modelo y ver qué corregir.',
+      q2: '¿Mis fotos salen de mi teléfono?', r2: 'No. Tus fotos solo se muestran en tu teléfono. La app no tiene cuenta y no envía nada a ningún servidor.',
+      q3: '¿En qué teléfonos funciona?', r3: 'En teléfonos con Android 7 o posterior. No hay versión para iPhone.',
+      q4: '¿Cómo cancelo la suscripción?', r4: 'En la app Google Play: icono de perfil, Pagos y suscripciones, Suscripciones, Lucida Drawing. Mantienes Ilimitado hasta el final del mes ya pagado.',
+      q5: '¿En qué idiomas?', r5: 'Español, inglés, francés y alemán. La app sigue el idioma de tu teléfono.',
+      droits: '© 2026 Lucida Drawing. Google Play es una marca de Google LLC.', contact: 'Contacto', confidentialite: 'Política de privacidad',
+      description: 'Haz una foto de tu dibujo, superpón la foto de tu modelo y ajusta la opacidad: los errores de proporción saltan a la vista. App para Android.'
+    },
+    de: {
+      eyebrow: 'Für alle, die zeichnen lernen',
+      titre: 'Sieh genau, wo deine Zeichnung von der Vorlage abweicht',
+      chapeau: 'Zeichne wie gewohnt freihand. Dann fotografierst du deine Zeichnung, legst das Foto deiner Vorlage darüber und stellst die Deckkraft ein: Proportionen, Winkel und Abstände, die nicht stimmen, springen sofort ins Auge.',
+      cta: 'Bald bei Google Play', cta2: "So funktioniert's",
+      opacite: 'Deckkraft', pourcent: function (n) { return n + ' %'; },
+      indice: 'Beweg den Regler: Die gelbe Birne ist die Vorlage, die Bleistiftlinien sind die Zeichnung.',
+      altDessin: 'Bleistiftzeichnung einer Birne auf kariertem Papier', altModele: 'Foto einer Birne als Vorlage',
+      etapesTitre: 'Drei Schritte, ohne Abpausen',
+      etape1T: 'Fotografiere deine Zeichnung', etape1: 'Nimm deine fertige Zeichnung mit der App auf.',
+      etape2T: 'Wähle deine Vorlage', etape2: 'Such in deiner Galerie das Foto aus, nach dem du gezeichnet hast.',
+      etape3T: 'Überlagern und vergleichen', etape3: 'Zieh die Vorlage auf deine Zeichnung, vergrößere oder drehe sie mit zwei Fingern und spiel mit der Deckkraft. Mit dem Raster findest du jede Abweichung.',
+      alt1: 'Startbildschirm von Lucida Drawing', alt2: 'Die Vorlage über der Zeichnung mit 50 % Deckkraft', alt3: 'Die Überlagerung mit einem Raster aus Buchstaben und Zahlen',
+      atoutsTitre: 'Warum du damit besser wirst',
+      atout1T: 'Du zeichnest wirklich selbst', atout1: 'Lucida Drawing projiziert nichts, während du zeichnest. Du arbeitest freihand und prüfst danach: So lernt das Auge.',
+      atout2T: 'Fehler werden sichtbar', atout2: 'Ein zu schmaler Kopf, ein zu hohes Auge, eine schiefe Achse: Übereinandergelegt ist die Abweichung offensichtlich und messbar.',
+      atout3T: 'Ein Raster, um sie zu finden', atout3: 'Spalten mit Buchstaben, Zeilen mit Zahlen: „Der Kiefer steht in D7 über“ lässt sich leichter korrigieren als „irgendwas stimmt nicht“.',
+      atout4T: 'Deine Fotos bleiben auf deinem Handy', atout4: 'Kein Konto, keine Werbung, kein Tracking. Nichts wird irgendwohin gesendet.',
+      altPrisme: 'Schema des Prismas einer Camera lucida: Das Licht des Motivs wird zweimal reflektiert und erreicht das Auge über dem Papier',
+      legendePrisme: 'Das Licht des Motivs wird im Prisma zweimal reflektiert und erreicht das Auge, das zugleich das Papier sieht.',
+      histoireTitre: 'Woher der Name kommt',
+      histoire: '1806 ließ William Hyde Wollaston die Camera lucida patentieren: ein kleines Prisma an einem Stab, mit dem Künstler ihr Motiv und ihr Papier gleichzeitig sehen. Lucida Drawing greift diese Idee auf, wenn die Zeichnung fertig ist: Vorlage und Zeichnung in einem Bild.',
+      prixTitre: 'Einfache Preise',
+      gratuitT: 'Kostenlos', gratuitMontant: '0 €', gratuit: '3 Vergleiche pro Tag, alle Funktionen inklusive.',
+      illimiteT: 'Unbegrenzt', illimiteMontant: '5 €', parMois: 'pro Monat', illimite: 'So viele Vergleiche, wie du willst. Ohne Mindestlaufzeit: jederzeit in Google Play kündbar.',
+      notePrix: 'Preise in Euro; Google Play zeigt den Gegenwert in deiner Währung.',
+      faqTitre: 'Häufige Fragen',
+      q1: 'Ist das eine Abpaus-App?', r1: 'Nein. Abpaus-Apps projizieren ein Bild, damit du es Strich für Strich nachzeichnest. Lucida Drawing nutzt du nach dem Zeichnen, um deine Arbeit mit der Vorlage zu vergleichen und zu sehen, was du korrigieren musst.',
+      q2: 'Verlassen meine Fotos mein Handy?', r2: 'Nein. Deine Fotos werden nur auf deinem Handy angezeigt. Die App hat kein Konto und sendet nichts an einen Server.',
+      q3: 'Auf welchen Handys läuft die App?', r3: 'Auf Android-Handys ab Android 7. Eine iPhone-Version gibt es nicht.',
+      q4: 'Wie kündige ich das Abo?', r4: 'In der Google-Play-App: Profilsymbol, Zahlungen und Abos, Abos, Lucida Drawing. Unbegrenzt bleibt bis zum Ende des bezahlten Monats aktiv.',
+      q5: 'In welchen Sprachen?', r5: 'Deutsch, Englisch, Französisch und Spanisch. Die App folgt der Sprache deines Handys.',
+      droits: '© 2026 Lucida Drawing. Google Play ist eine Marke von Google LLC.', contact: 'Kontakt', confidentialite: 'Datenschutzerklärung',
+      description: 'Fotografiere deine Zeichnung, leg das Foto deiner Vorlage darüber und stell die Deckkraft ein: Proportionsfehler springen ins Auge. Android-App.'
+    }
+  };
+  var CLE = 'lucida-drawing-langue';
+  var langue = 'en';
+
+  function choisir() {
+    try { var m = localStorage.getItem(CLE); if (m && TEXTES[m]) return m; } catch (e) {}
+    var l = String((navigator.languages && navigator.languages[0]) || navigator.language || 'en').slice(0, 2).toLowerCase();
+    return TEXTES[l] ? l : 'en';
+  }
+  function t(cle) { var v = TEXTES[langue][cle]; return v === undefined ? TEXTES.en[cle] : v; }
+
+  var curseur = document.getElementById('demo-opacite');
+  var sortie = document.getElementById('demo-valeur');
+  var modele = document.getElementById('demo-modele');
+  function majDemo() {
+    var n = +curseur.value;
+    modele.style.opacity = n / 100;
+    sortie.textContent = t('pourcent')(n);
+    curseur.style.setProperty('--p', n + '%');
+  }
+
+  function appliquer(l) {
+    langue = l;
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t(el.dataset.t); });
+    document.querySelectorAll('[data-t-alt]').forEach(function (el) { el.alt = t(el.dataset.tAlt); });
+    document.querySelectorAll('[data-t-aria]').forEach(function (el) { el.setAttribute('aria-label', t(el.dataset.tAria)); });
+    document.querySelectorAll('[data-capture]').forEach(function (el) { el.src = 'capture-' + el.dataset.capture + '-' + l + '.webp'; });
+    document.querySelectorAll('[data-langue]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.langue === l)); });
+    document.getElementById('lien-confidentialite').href = 'privacy.html#' + l;
+    var d = document.querySelector('meta[name="description"]'); if (d) d.setAttribute('content', t('description'));
+    majDemo();
+  }
+
+  document.querySelectorAll('[data-langue]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      try { localStorage.setItem(CLE, b.dataset.langue); } catch (e) {}
+      appliquer(b.dataset.langue);
+    });
+  });
+  curseur.addEventListener('input', majDemo);
+  appliquer(choisir());
+})();
+</script>
+</body>
+</html>
