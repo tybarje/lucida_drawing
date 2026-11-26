@@ -60,6 +60,7 @@ h2{font-family:var(--f-titre);font-weight:400;font-size:clamp(2rem,4.5vw,2.9rem)
 .actions{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}
 .bouton{display:inline-flex;align-items:center;gap:.6rem;min-height:50px;padding:0 1.3rem;border-radius:999px;font-weight:700;text-decoration:none;font-size:1rem}
 .bouton.store{background:var(--graphite);color:var(--sur-graphite)}
+.bouton.store:hover{box-shadow:0 0 0 3px var(--jaune)}
 .bouton.store small{font:500 .7rem/1 var(--f-chiffres);letter-spacing:.06em;text-transform:uppercase;color:var(--jaune)}
 .bouton.lien{border:1px solid var(--encre);color:var(--encre)}
 .bouton.lien:hover{background:var(--encre);color:var(--papier)}
@@ -165,7 +166,7 @@ section{padding-block:4.5rem}
       <h1 data-t="titre">See exactly where your drawing drifts from the model</h1>
       <p class="chapeau" data-t="chapeau">Draw freehand as usual. Then photograph your drawing, lay the image of your model over it and adjust the opacity: proportions, angles and spacing that are off jump out at once.</p>
       <div class="actions">
-        <span class="bouton store" aria-disabled="true"><span data-t="cta">Coming soon on Google Play</span><small>Android</small></span>
+        <a class="bouton store" href="https://play.google.com/store/apps/details?id=com.tybarje.lucidadrawing&amp;utm_source=site&amp;utm_campaign=vitrine" rel="noopener"><span data-t="cta">Get it on Google Play</span><small>Android</small></a>
         <a class="bouton lien" href="#comment" data-t="cta2">See how it works</a>
       </div>
     </div>
@@ -288,7 +289,7 @@ section{padding-block:4.5rem}
       eyebrow: 'For people learning to draw',
       titre: 'See exactly where your drawing drifts from the model',
       chapeau: 'Draw freehand as usual. Then photograph your drawing, lay the image of your model over it and adjust the opacity: proportions, angles and spacing that are off jump out at once.',
-      cta: 'Coming soon on Google Play', cta2: 'See how it works',
+      cta: 'Get it on Google Play', cta2: 'See how it works',
       opacite: 'Opacity', pourcent: function (n) { return n + '%'; },
       indice: 'Move the slider: the yellow pear is the model, the pencil lines are the drawing.',
       altDessin: 'Pencil drawing of a pear on squared paper', altModele: 'Photo of a pear, used as the model',
@@ -323,7 +324,7 @@ section{padding-block:4.5rem}
       eyebrow: 'Pour apprendre à dessiner',
       titre: "Vois exactement où ton dessin s'écarte du modèle",
       chapeau: "Dessine à main levée, comme d'habitude. Ensuite, photographie ton dessin, pose l'image de ton modèle par-dessus et règle l'opacité : les proportions, les angles et les distances qui ne vont pas sautent aux yeux.",
-      cta: 'Bientôt sur Google Play', cta2: 'Voir comment ça marche',
+      cta: 'Disponible sur Google Play', cta2: 'Voir comment ça marche',
       opacite: 'Opacité', pourcent: function (n) { return n + ' %'; },
       indice: 'Bouge le curseur : la poire jaune est le modèle, les traits de crayon sont le dessin.',
       altDessin: "Dessin au crayon d'une poire sur papier quadrillé", altModele: "Photo d'une poire, utilisée comme modèle",
@@ -358,7 +359,7 @@ section{padding-block:4.5rem}
       eyebrow: 'Para quien aprende a dibujar',
       titre: 'Ve exactamente dónde se aleja tu dibujo del modelo',
       chapeau: 'Dibuja a mano alzada, como siempre. Después, haz una foto de tu dibujo, coloca encima la imagen de tu modelo y ajusta la opacidad: las proporciones, los ángulos y las distancias que fallan saltan a la vista.',
-      cta: 'Próximamente en Google Play', cta2: 'Ver cómo funciona',
+      cta: 'Disponible en Google Play', cta2: 'Ver cómo funciona',
       opacite: 'Opacidad', pourcent: function (n) { return n + ' %'; },
       indice: 'Mueve el control: la pera amarilla es el modelo, los trazos de lápiz son el dibujo.',
       altDessin: 'Dibujo a lápiz de una pera sobre papel cuadriculado', altModele: 'Foto de una pera, usada como modelo',
@@ -393,7 +394,7 @@ section{padding-block:4.5rem}
       eyebrow: 'Für alle, die zeichnen lernen',
       titre: 'Sieh genau, wo deine Zeichnung von der Vorlage abweicht',
       chapeau: 'Zeichne wie gewohnt freihand. Dann fotografierst du deine Zeichnung, legst das Bild deiner Vorlage darüber und stellst die Deckkraft ein: Proportionen, Winkel und Abstände, die nicht stimmen, springen sofort ins Auge.',
-      cta: 'Bald bei Google Play', cta2: "So funktioniert's",
+      cta: 'Jetzt bei Google Play', cta2: "So funktioniert's",
       opacite: 'Deckkraft', pourcent: function (n) { return n + ' %'; },
       indice: 'Beweg den Regler: Die gelbe Birne ist die Vorlage, die Bleistiftlinien sind die Zeichnung.',
       altDessin: 'Bleistiftzeichnung einer Birne auf kariertem Papier', altModele: 'Foto einer Birne als Vorlage',
